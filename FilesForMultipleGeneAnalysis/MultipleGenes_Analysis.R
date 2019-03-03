@@ -2,9 +2,16 @@ library("ggplot2")
 library("reshape2")
 library("tidyr")
 library("pheatmap")
+library("readr")
+
+# To avoid data.frame vs tibble issues (eg with deprecated rownames)
+read_tsv <- function(...) {
+  as.data.frame(suppressMessages(readr::read_tsv(...)))
+}
 
 parent.dir <- "Add working directory" 
 setwd(parent.dir)
+shared.files.dir <- file.path("..", "FilesShared") # Set location of FilesShared folder here
 
 GenesDF <- read.table("MultipleGeneTable.txt", sep = "\t", header = TRUE)
 SetName <- "Name Gene Set"
@@ -16,13 +23,13 @@ EnsemblIDs <- as.character(GenesDF$Ensembl)
 dir.create(paste(parent.dir, "CellLine2D", sep="/")) # create a new folder to put the files in
 outputdir <- paste(parent.dir, "CellLine2D/", sep="/")
 
-CellLineExpression_2D <- read.table("LogNormalizedCounts_2DCellLines.txt", sep = "\t", header = TRUE) # Load expression data
+CellLineExpression_2D <- read_tsv(file.path(shared.files.dir, "LogNormalizedCounts_2DCellLines.txt.xz")) # Load expression data
 rownames(CellLineExpression_2D) <- CellLineExpression_2D$EnsemblID # Put the ensemblID in the rownames
 CellLineExpression_2D$EnsemblID <- NULL # Remove the ensemblID column now they are in the rownames
 CellLineExpression_2D <- as.data.frame(t(CellLineExpression_2D)) # transform the data frame so the cell lines are in the row names
 CellLineExpression_2D$CellLine <- rownames(CellLineExpression_2D) # Create a cell line column that can be used to merge data frames
 
-CellLine_Subtype <- read.table("Subtype_CellLines.txt", sep = "\t", header = TRUE) # Load the file containing cell line subtype information
+CellLine_Subtype <- read_tsv(file.path(shared.files.dir,"Subtype_CellLines.txt")) # Load the file containing cell line subtype information
 
 Subtype_Expression_DF <- merge(CellLine_Subtype, CellLineExpression_2D)
 
@@ -109,8 +116,8 @@ dev.off()
 dir.create(paste(parent.dir, "CellLine2Dvs3D", sep="/")) # create a new folder to put the files in
 outputdir <- paste(parent.dir, "CellLine2Dvs3D/", sep="/")
 
-NormalizedCounts <- read.table("NormalizedCounts_2Dvs3D.txt", sep = "\t", header = TRUE)
-MetaDataDF <- read.table("MetaData_2Dvs3D.txt", sep = "\t", header = TRUE)
+NormalizedCounts <- read_tsv(file.path(shared.files.dir, "NormalizedCounts_2Dvs3D.txt.xz"))
+MetaDataDF <- read_tsv(file.path(shared.files.dir, "MetaData_2Dvs3D.txt"))
 
 NormalizedCounts_Genes <- NormalizedCounts[NormalizedCounts$ensembl %in% EnsemblIDs, ] # select genes of interest
 rownames(NormalizedCounts_Genes) <- NormalizedCounts_Genes$symbol
@@ -206,7 +213,7 @@ dev.off()
 dir.create(paste(parent.dir, "TCGAsubtypes", sep="/")) # create a new folder to put the files in
 outputdir <- paste(parent.dir, "TCGAsubtypes/", sep="/")
 
-TCGA_Subtype_DF <- read.table("TCGA_PrimaryTumor_Subtype_Expression.txt", sep = "\t", header = TRUE) # Load TCGA data
+TCGA_Subtype_DF <- read_tsv(file.path(shared.files.dir, "TCGA_PrimaryTumor_Subtype_Expression.txt.xz")) # Load TCGA data
 TCGA_Subtype_DF[1:5, 1:5]
 GeneDF <- subset(TCGA_Subtype_DF, select = c("TumorType", paste("ID", GeneIDs, sep = "_")))
 GeneDF$PatientID <- seq(from = 1, to = nrow(GeneDF), by = 1)
@@ -294,13 +301,13 @@ dev.off()
 dir.create(paste(parent.dir, "TCGA_TumorVsNormal", sep="/")) # create a new folder to put the files in
 outputdir <- paste(parent.dir, "TCGA_TumorVsNormal/", sep="/")
 
-TumorData <- read.table("BRCA__illuminahiseq_rnaseqv2__GeneExp_PrimarySolidTumor.txt", sep = "\t", header = TRUE)
+TumorData <- read_tsv(file.path(shared.files.dir, "BRCA__illuminahiseq_rnaseqv2__GeneExp_PrimarySolidTumor.txt.xz"))
 colnames(TumorData) <- c("GeneSymbol", "EntrezID", gsub(".{16}$", "", colnames(TumorData)[-c(1,2)])) # change the column names to patient IDs by removing the last 16 characters
 TumorData_Genes <- TumorData[TumorData$EntrezID %in% GeneIDs, ]  # Select genes of interest
 TumorData_Genes2 <- TumorData_Genes # rename the data frame
 colnames(TumorData_Genes2) [-c(1,2)] <- paste("T", colnames(TumorData_Genes2) [-c(1,2)], sep = "_") # create patient IDs refering to tissue type
 
-NormalTissueData <- read.table("BRCA__illuminahiseq_rnaseqv2__GeneExp_SolidTissueNormal.txt", sep = "\t", header = TRUE)
+NormalTissueData <- read_tsv(file.path(shared.files.dir, "BRCA__illuminahiseq_rnaseqv2__GeneExp_SolidTissueNormal.txt.xz"))
 colnames(NormalTissueData) <- c("GeneSymbol", "EntrezID", gsub(".{16}$", "", colnames(NormalTissueData)[-c(1,2)])) # change the column names to patient IDs by removing the last 16 characters
 NormalTissueData_Gene <- NormalTissueData[NormalTissueData$EntrezID %in% GeneIDs, ] # Select gene of interest
 NormalTissueData_Gene2 <- NormalTissueData_Gene # rename the data frame
@@ -423,9 +430,9 @@ dev.off()
 dir.create(paste(parent.dir, "TCGApatientVs2DVs3D", sep="/")) # create a new folder to put the files in
 outputdir <- paste(parent.dir, "TCGApatientVs2DVs3D/", sep="/")
 
-RNAseq_2Dvs3D <- read.table("NormalizedCounts_2Dvs3D.txt", sep = "\t", header = TRUE)
+RNAseq_2Dvs3D <- read_tsv(file.path(shared.files.dir, "NormalizedCounts_2Dvs3D.txt.xz"))
 TCGA_ReceptorStatus <- read.table("TCGApatient_ReceptorStatus.txt", sep = "\t", header = TRUE)
-RNAseq_TCGA <- read.table("TCGARNAseq_LogNormalized.txt", sep = "\t", header = TRUE)
+RNAseq_TCGA <- read_tsv("TCGARNAseq_LogNormalized.txt.xz")
 
 RNAseq_TCGA2 <- RNAseq_TCGA # Adjust TCGA data frame
 RNAseq_TCGA2$PatientID <- substr(RNAseq_TCGA2$PatientID, 1, 12)
@@ -452,7 +459,7 @@ CorDF <- CorDF[, c("BT474_2D", "BT474_3D", "MDAMB175_2D", "MDAMB175_3D", "SKBR3_
                        "BT549_2D", "BT549_3D", "Hs578T_2D", "Hs578T_3D",
                        "MDAMB231_2D", "MDAMB231_3D", "SUM149PT_2D", "SUM149PT_3D")]
 
-MetaDataDF <- read.table("MetaData_2Dvs3D.txt", sep = "\t", header = TRUE)
+MetaDataDF <- read_tsv(file.path(shared.files.dir, "MetaData_2Dvs3D.txt"))
 MetaDataDF <- unique(subset(MetaDataDF, select = c("CellLine", "X2D.3D", "Subtype")))
 MetaDataDF$CellLine <- gsub("-", "", MetaDataDF$CellLine)
 MetaDataDF$SampleID <- paste(MetaDataDF$CellLine, MetaDataDF$X2D.3D, sep = "_")

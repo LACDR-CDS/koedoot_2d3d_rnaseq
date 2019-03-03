@@ -1,8 +1,15 @@
 library("ggplot2")
 library("reshape2")
+library("readr")
+
+# To avoid data.frame vs tibble issues (eg with deprecated rownames)
+read_tsv <- function(...) {
+  as.data.frame(suppressMessages(readr::read_tsv(...)))
+}
 
 parent.dir <- "Add working directory" 
 setwd(parent.dir)
+shared.files.dir <- file.path("..", "FilesShared") # Set location of FilesShared folder here
 
 SingleGeneDF <- read.table("SingleGene.txt", sep = "\t", header = TRUE)
 GeneSymbol <- SingleGeneDF$GeneSymbol
@@ -14,13 +21,13 @@ EnsemblID <- as.character(SingleGeneDF$Ensembl)
 dir.create(paste(parent.dir, "CellLine2D", sep="/")) # create a new folder to put the files in
 outputdir <- paste(parent.dir, "CellLine2D/", sep="/")
 
-CellLineExpression_2D <- read.table("LogNormalizedCounts_2DCellLines.txt", sep = "\t", header = TRUE) # Load expression data
+CellLineExpression_2D <- read_tsv(file.path(shared.files.dir, "LogNormalizedCounts_2DCellLines.txt.xz")) # Load expression data
 rownames(CellLineExpression_2D) <- CellLineExpression_2D$EnsemblID # Put the ensemblID in the rownames
 CellLineExpression_2D$EnsemblID <- NULL # Remove the ensemblID column now they are in the rownames
 CellLineExpression_2D <- as.data.frame(t(CellLineExpression_2D)) # transform the data frame so the cell lines are in the row names
 CellLineExpression_2D$CellLine <- rownames(CellLineExpression_2D) # Create a cell line column that can be used to merge data frames
 
-CellLine_Subtype <- read.table("Subtype_CellLines.txt", sep = "\t", header = TRUE) # Load the file containing cell line subtype information
+CellLine_Subtype <- read_tsv(file.path(shared.files.dir,"Subtype_CellLines.txt")) # Load the file containing cell line subtype information
 
 Subtype_Expression_DF <- merge(CellLine_Subtype, CellLineExpression_2D)
 
@@ -96,8 +103,8 @@ dev.off()
 dir.create(paste(parent.dir, "CellLine2Dvs3D", sep="/")) # create a new folder to put the files in
 outputdir <- paste(parent.dir, "CellLine2Dvs3D/", sep="/")
 
-NormalizedCounts <- read.table("NormalizedCounts_2Dvs3D.txt", sep = "\t", header = TRUE)
-MetaDataDF <- read.table("MetaData_2Dvs3D.txt", sep = "\t", header = TRUE)
+NormalizedCounts <- read_tsv(file.path(shared.files.dir, "NormalizedCounts_2Dvs3D.txt.xz"))
+MetaDataDF <- read_tsv(file.path(shared.files.dir, "MetaData_2Dvs3D.txt"))
 
 NormalizedCounts_Long <- melt(NormalizedCounts, id.vars = c("symbol", "entrez", "ensembl"), 
                                        variable.name = "Sample", value.name = "Expression") # create a long data frame
@@ -161,7 +168,7 @@ write.table(NormalizedCounts_Gene, file = paste(outputdir, GeneSymbol, "_FoldCha
 dir.create(paste(parent.dir, "TCGAsubtypes", sep="/")) # create a new folder to put the files in
 outputdir <- paste(parent.dir, "TCGAsubtypes/", sep="/")
 
-TCGA_Subtype_DF <- read.table("TCGA_PrimaryTumor_Subtype_Expression.txt", sep = "\t", header = TRUE) # Load TCGA data
+TCGA_Subtype_DF <- read_tsv(file.path(shared.files.dir, "TCGA_PrimaryTumor_Subtype_Expression.txt.xz")) # Load TCGA data
 
 GeneDF <- subset(TCGA_Subtype_DF, select = c("TumorType", paste("ID", GeneID, sep = "_")))
 colnames(GeneDF) <- c("TumorType", "ExpressionLevel")
@@ -194,12 +201,12 @@ write.table(GeneDF, file = paste(outputdir, GeneSymbol, "_TNBCvsERpos_TCGAprimar
 dir.create(paste(parent.dir, "TCGA_TumorVsNormal", sep="/")) # create a new folder to put the files in
 outputdir <- paste(parent.dir, "TCGA_TumorVsNormal/", sep="/")
 
-TumorData <- read.table("BRCA__illuminahiseq_rnaseqv2__GeneExp_PrimarySolidTumor.txt", sep = "\t", header = TRUE)
+TumorData <- read_tsv(file.path(shared.files.dir, "BRCA__illuminahiseq_rnaseqv2__GeneExp_PrimarySolidTumor.txt.xz"))
 colnames(TumorData) <- c("GeneSymbol", "EntrezID", gsub(".{16}$", "", colnames(TumorData)[-c(1,2)])) # change the column names to patient IDs by removing the last 16 characters
 TumorPatients <- colnames(TumorData)[-c(1,2)] # vector of patients in tumor data
 TumorData_Gene <- subset(TumorData, EntrezID == GeneID) # Select gene of interest
 
-NormalTissueData <- read.table("BRCA__illuminahiseq_rnaseqv2__GeneExp_SolidTissueNormal.txt", sep = "\t", header = TRUE)
+NormalTissueData <- read_tsv(file.path(shared.files.dir, "BRCA__illuminahiseq_rnaseqv2__GeneExp_SolidTissueNormal.txt.xz"))
 colnames(NormalTissueData) <- c("GeneSymbol", "EntrezID", gsub(".{16}$", "", colnames(NormalTissueData)[-c(1,2)])) # change the column names to patient IDs by removing the last 16 characters
 NormalTissuePatients <- colnames(NormalTissueData)[-c(1,2)] # vector of patients in normal data
 NormalTissueData_Gene <- subset(NormalTissueData, EntrezID == GeneID) # Select gene of interest
