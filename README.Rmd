@@ -1,0 +1,200 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(readr)
+read_tsv <- function(...) {
+  suppressMessages(readr::read_tsv(...))
+}
+mycat <- function(text){
+  cat(gsub(pattern = "\n", replacement = "  \n", x = text))
+}
+```
+
+# Koedoot et al. 2019. Data and Code
+
+Data and code for Koedoot et al., Differential reprogramming of breast cancer subtypes in 3D cultures and implications for sensitivity to targeted therapy. (2019)
+
+# Installation
+
+Clone this repository or download the current version as [a zip file](https://gitlab.com/lacdr-dds/vandewater/koedoot_2d3d_rnaseq/-/archive/master/koedoot_2d3d_rnaseq-master.zip). 
+
+# Usage
+
+Files that are used in both Single and Multiple Gene Analyses are stored in the [`FilesShared`](FilesShared) folder. This folder contains the following files (files that end in `.xz` are compressed to save space):
+
+`r paste0("- <code>",dir('FilesShared/'), "</code>", collapse = "\n")`
+
+## Single Gene 
+
+Create a working directory that contains the following files (can be found in [`FilesForSingleGeneAnalysis`](FilesForSingleGeneAnalysis)):
+
+`r paste0("- <code>", dir('FilesForSingleGeneAnalysis/', pattern = '\\.(R|txt(\\.xz)?)$'), "</code>", collapse = "\n")`
+
+You can set the working directory and the `FilesShared` directory using the `parent.dir` and `shared.files.dir` variable at [SingleGene_Analysis.R#L10-12](FilesForSingleGeneAnalysis/SingleGene_Analysis.R#L10-12).
+
+This script can be used to:
+
+-   Determine the expression of a single gene in more than 50 breast
+    cancer cell lines cultured in 2D and compare different subtypes
+    (luminal, basal A and basal B) -- [SingleGene_Analysis.R#L19-98](FilesForSingleGeneAnalysis/SingleGene_Analysis.R#L19-98)
+-   Compare the expression level of a single gene in breast cancer cell
+    lines cultured in 2D and 3D including subtype comparisons (luminal,
+    basal A and basal B) -- [SingleGene_Analysis.R#L101-164](FilesForSingleGeneAnalysis/SingleGene_Analysis.R#L101-164)
+-   Determine the expression level of a single gene in normal and breast
+    cancer tissue using RNA sequencing data derived from The Cancer
+    Genome Atlas (TCGA) -- [SingleGene_Analysis.R#L166-197](FilesForSingleGeneAnalysis/SingleGene_Analysis.R#L166-197)
+-   Determine the expression level of a single gene in different breast
+    cancer subtypes (estrogen receptor positive and triple negative)
+    using RNA sequencing data derived from TCGA -- [SingleGene_Analysis.R#L199-311](FilesForSingleGeneAnalysis/SingleGene_Analysis.R#L199-311)
+
+**Important note:** you can run these parts of the script separately, but before you start you **ALWAYS** have to run [SingleGene_Analysis.R#L1-17](FilesForSingleGeneAnalysis/SingleGene_Analysis.R#1-17). Make sure you set the correct working directory.
+
+### Input
+
+- A `.txt` file containing the gene symbol, ensembl ID and entrez gene ID.
+    - Name of the file: `SingleGene.txt`
+    - Save this file in the working directory containing all the other
+    files.
+    - **Important:** make sure that the column names exactly match [the example file](FilesForSingleGeneAnalysis/ExampleGeneInputFile/SingleGene.txt), also
+    shown below.
+
+```{r, echo=FALSE}
+read_tsv('FilesForSingleGeneAnalysis/ExampleGeneInputFile/SingleGene.txt')
+```
+
+### Output
+
+4 output folders will be created:
+
+1. **CellLine2D**  
+  This folder contains the results of single gene expression level in more than 50 breast cancer cell lines cultured in 2D comparing different subtypes. For EGFR this results in the following files:
+  
+   - `EGFR_CountsPerCellLine.pdf` Barplot of log2 normalized counts ordered by cell line name.
+   - `EGFR_CountsPerCellLine.pdf` Sorted. Barplot of log2 normalized counts ordered by expression level.
+   - `EGFR_CountsPerSubtype.pdf` Boxplot of log2 normalized counts per subtype.
+   - `EGFR_Log2Expression.txt` Text file containing log2 normalized counts, cell lines and subtypes that can be used to create personal graphs.
+
+2. **CellLine2Dvs3D**  
+  This folder contains the results files of single gene expression in breast cancer cell lines cultured in 2D and 3D also comparing different subtypes. For EGFR this results in the following files:
+  
+   - `EGFR_2D3D_Log2Counts.pdf` Barplot of log2 normalized counts of all cell lines in 2D and 3D ordered by subtype.
+   - `EGFR_FoldChange2Dvs3D.pdf` Barplot of log2 fold change comparing 2D to 3D expression levels per cell line. Ordered by fold change. Positive log fold change corresponds to high expression levels in 2D, negative log fold change corresponds to higher expression levels in 3D.
+   - `EGFR_FoldChange2Dvs3D.txt` Text file containing log2 normalized counts in 2D and 3D and log fold changes per cell line that can be used to create personal graphs.
+
+3. **TCGA_TumorVsNormal**  
+This folder contains the expression level of a single gene comparing normal breast to tumor tissue derived from RNA sequencing data from the TCGA database. For EGFR this results in the following files:
+
+   - `EGFR_PrimaryTumorvsNormalTissue_NonMatched_Boxplot.pdf` Boxplot displaying the log2 normalized expression levels of the single gene in all normal and tumor tissue with data available in the database. Patients are not matched.
+   - `EGFR_PrimaryTumorvsNormalTissue_NonMatched.txt` Text file containing the log2 normalized expression levels of the gene of interest in all normal and tumor data.
+   - `EGFR_PrimaryTumorvsNormalTissue_Matched_Boxplot.pdf` Boxplot displaying the log2 normalized expression levels of matched normal and tumor tissue samples (N = 114).
+   - `EGFR_PrimaryTumorvsNormalTissue_Matched_DensityPlot.pdf` Density plot of the log2 fold change between normal and tumor tissue for matched patient samples (N = 114). Positive log2 fold change corresponds to higher expression levels in primary tumor tissue compared to normal tissue.
+   - `EGFR_PrimaryTumorvsNormalTissue_Matched.txt` Text file containing the log2 normalized counts of the single gene for matched samples.
+
+4. **TCGAsubtypes**  
+This folder contains the expression level of a single gene comparing estrogen receptor (ER) positive tumors to triple negative breast cancer (TNBC). RNA sequencing data from TCGA was used. For EGFR this results in the following files:
+
+   - `EGFR_TNBCvsERpos_TCGAprimarytumors.pdf` Boxplot of log2 normalized expression levels of the gene of interest in ER positive and TNBC.
+   - `EGFR_TNBCvsERpos_TCGAprimarytumors.txt` Text file containing log2 normalized expression levels of gene of interest in ER positive and TNBC that can be used to create personal graphs. 
+    
+## Multiple Genes
+
+Create a working directory that contains the following files ([`FilesForMultipleGeneAnalysis`](FilesForMultipleGeneAnalysis)):
+
+`r paste0("- <code>", dir('FilesForMultipleGeneAnalysis/', pattern = '\\.(R|txt(\\.xz)?)$'), "</code>", collapse = "\n")`
+
+You can set the working directory and the `FilesShared` directory using the `parent.dir` and `shared.files.dir` variable at [MultipleGenes_Analysis.R#L12-14](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L12-14).
+
+This script can be used to:
+
+-   Determine the expression of a the gene set in more than 50 breast cancer cell lines cultured in 2D and compare different subtypes (luminal, basal A and basal B) -- [MultipleGenes_Analysis.R#L21-111](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L21-111)
+-   Compare the expression level of a gene set in breast cancer cell lines cultured in 2D versus 3D including subtype comparisons (luminal, basal A and basal B) -- [MultipleGenes_Analysis.R#L114-209](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L114-209)
+-   Determine the expression level of a gene set in normal and breast cancer tissue using RNA sequencing data derived from The Cancer Genome Atlas (TCGA) -- [MultipleGenes_Analysis.R#L211-297](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L211-297)
+-   Determine the expression level of a gene set in different breast cancer subtypes (estrogen receptor positive and triple negative) using RNA sequencing data derived from TCGA -- [MultipleGenes_Analysis.R#L299-424](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L299-424)
+-   Define the optimal cell model to study the gene set of interest by calculating spearman correlations between RNA sequencing of cell lines cultured in 2D or 3D versus TCGA derived RNA sequencing data.
+
+**Important notes:**
+
+- Except for the correlation between cell line and TCGA derived RNA sequencing data, you can run these parts of the script separately. However before you start, you **ALWAYS** have run [MultipleGenes_Analysis.R#L1-19](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L1-19). Before running the correlation between TCGA and cell line derived sequencing, you have to run the full script.
+- The name of the gene set can be entered at [MultipleGenes_Analysis.R#L17](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L17) after `SetName`. This name will be used as a prefix in the saved files.
+- Make sure you set the correct working directory.
+
+### Input
+
+- A `.txt` file containing the gene symbols, ensembl IDs and entrez gene IDs of your genes of interest.
+
+   - Name of the file: MultipleGeneTable.txt
+   - Save this file in the working directory containing all the other
+   files.
+   - **Important:** make sure that the column names exactly match [the example file](FilesForMultipleGeneAnalysis/Example_Spliceosome_GeneSet/MultipleGeneTable.txt), also
+   shown below.
+```{r, echo=F}
+read_tsv('FilesForMultipleGeneAnalysis/Example_Spliceosome_GeneSet/MultipleGeneTable.txt') 
+```
+- Define the name of your set of genes at [MultipleGenes_Analysis.R#L17](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L17)
+- In all steps an initial clustering will be created and saved showing log2 expression levels of every gene in the gene set. Based on this clustering, genes with low expression levels in all datasets can be removed. In order to do this, a `.txt` file containing the gene symbols of genes to be removed have to be put in the working directory. [The example file](FilesForMultipleGeneAnalysis/Example_Spliceosome_GeneSet/GenesToRemove_2D.txt) is shown below. The filename is specified in the explanation of the different output folders below.
+    
+```{r, echo=F}
+read_tsv('FilesForMultipleGeneAnalysis/Example_Spliceosome_GeneSet/GenesToRemove_2D.txt', col_names = F) 
+```
+
+### Output
+
+5 output folders will be created:
+
+1. **CellLine2D**  
+This folder contains the results of gene set expression levels in more than 50 breast cancer cell lines cultured in 2D comparing different subtypes. For the spliceosome this results in the following files:
+
+   - `Spliceosome_Log2Expression.pdf` Hierarchical clustering based on Euclidean distance of log2 expression levels in more than 50 breast cancer cell lines of all genes in the gene set of interest. In this clustering, you might discover genes with very low expression levels across the whole dataset. These genes can be removed before further analysis by copying their gene symbols from the clustering pdf to an excel file. This file has to be saved in the working directory under the name `GenesToRemove_2D.txt`. If gene removal is not necessary, this file can be left empty.
+   - `Spliceosome_Log2Expression_AfterSelection.pdf` Same as above, but now without the selected genes removed.
+   - `Spliceosome_Log2Expression_MedianNormalizedPerGene.pdf` Hierarchical clustering based on Euclidean distance and complete linkage of selected genes after median normalization. Differential expression between different cell lines and subtypes can be observed.
+   - `Spliceosome_Log2Expression.txt` Text file containing log2 normalized counts of the full gene set in different breast cancer cell lines.
+
+2. **CellLine2Dvs3D**  
+This folder contains the results files of gene set expression levels in breast cancer cell lines cultured in 2D and 3D also comparing different subtypes. For the spliceosome this results in the following files:
+
+   - `Spliceosome_Log2Expression_2Dvs3DSamples.pdf` Hierarchical clustering based on Euclidean distance of log2 expression levels in breast cancer cell lines cultured in 2D and 3D. In this clustering, you might discover genes with very low expression levels across the whole dataset. These genes can be removed before further analysis by copying their gene symbols from the clustering pdf to an excel file. This file has to be saved in the working directory under the name `GenesToRemove_2Dvs3D.txt`. If gene removal is not necessary, this file can be left empty.
+   - `Spliceosome_Log2Expression_2Dvs3DSamples_AfterSelection.pdf` Same clustering as above, but now genes selected for removal are deleted from the dataset.
+   - `Spliceosome_LogFoldChange_2Dvs3D.pdf` Clustering of log2 fold changes comparing 2D to 3D expression levels per cell line. A positive log fold change corresponds to higher expression levels in 2D, negative log fold change corresponds to higher expression levels in 3D.
+   - `Spliceosome_2Dvs3D_Log2NormalizedCounts.txt` Text file containing log2 normalized counts in cell lines cultured in 2D and 3D.
+   - `Spliceosome_2Dvs3DFoldChange.txt` Text file containing log2 fold changes for the selected gene set comparing 2D to 3D expression levels. A positive log fold change corresponds to higher expression levels in 2D, negative log fold change corresponds to higher expression levels in 3D.
+
+3. **TCGAsubtypes**  
+This folder contains the expression levels of the selected gene set comparing estrogen receptor (ER) positive tumors to triple negative breast cancer (TNBC). RNA sequencing data from TCGA was used. For the spliceosome this results in the following files:
+
+   - `Spliceosome_Log2Expression_TCGApatients_Subtypes.pdf` Hierarchical clustering based on Euclidean distance of log2 normalized counts in TCGA derived primary tumor data. In this clustering, you might discover genes with very low expression levels across the whole dataset. These genes can be removed before further analysis by copying their gene symbols from the clustering pdf to an excel file. This file has to be saved in the working directory under the name `GenesToRemove_TCGA_Subtype.txt`. If gene removal is not necessary, this file can be left empty.
+   - `Spliceosome_Log2Expression_TCGApatients_Subtypes_AfterGeneRemoval.pdf` Same as above genes selected to be removed are deleted from the dataset.
+   - `Spliceosome_Log2Expression_TCGApatients_Subtypes_MedianNorm.pdf` Hierarchical clustering based on Euclidean distance of log2 counts normalized to median expression levels per gene.
+   - `Spliceosome_PatientSubtypeAnnotation.txt` Text file containing patient IDs as shown in the clustering and tumor subtype.
+   - `Spliceosome_TNBCvsERpos_TCGApatients.txt` Text file containing log2 normalized expression levels of the selected gene set in all primary breast tumors available in the TCGA database.
+
+4. **TCGA_TumorVsNormal**  
+This folder contains the expression level of the selected gene set comparing normal breast to tumor tissue derived from RNA sequencing data from the TCGA database. For the spliceosome this results in the following files:
+
+   - `Spliceosome_Log2Expression_TCGApatients_TumorVsNormal.pdf` Hierarchical clustering based on log2 expression levels of the selected gene set in all breast cancer primary tumor and breast normal tissue samples available in TCGA. In this clustering, you might discover genes with very low expression levels across the whole dataset. These genes can be removed before further analysis by copying their gene symbols from the clustering pdf to an excel file. This file has to be saved in the working directory under the name `GenesToRemove_TCGA_TumorVsNormal.txt`. If gene removal is not necessary, this file can be left empty.
+   - `Spliceosome_Log2Expression_TCGApatients_TumorVsNormal_AfterGeneRemoval.pdf` Same as above genes selected to be removed are deleted from the dataset.
+   - `Spliceosome_Log2Expression_TCGApatients_TumorVsNormal_LogFoldChangeMatchedPatients.pdf. Hierarchical clustering (Euclidean distance, complete linkage) displaying the log2 fold change of selected gene expression levels of matched normal and tumor tissue samples (N = 114).
+   - `Spliceosome_Log2Expression_TCGApatients_TumorVsNormal_MedianNorm.pdf` Hierarchical clustering (Euclidean distance, complete linkage) of log2 expression levels of selected genes in normal and primary breast tumor tissue normalized to the median expression per gene.
+   - `Spliceosome_NormalVsTumor_TCGApatients_Log2Expression.txt` Log2 expression of genes in normal and primary breast tumor tissue.
+
+5. **TCGApatientVs2DVs3D**   This folder contains the results of the transcriptomic comparison between different in vitro models (cell lines cultured in 2D and 3D conditions) and breast cancer primary tumors for the gene set of interest. Genes comparisons are generated taking into consideration all tumors, only ER positive tumors or only TNBC tumors. For the spliceosome this results in the following files:
+
+   - `TCGApatient_ReceptorStatus.txt` Text file containing TCGA tumor patient IDs and hormone receptor status of the corresponding primary tumor.
+   - `TCGA_CellLine_Correlation_AllTumors.txt` Text file containing spearman correlation for all possible cell model patient tumor combinations for the spliceosomal gene set.
+   - `Spliceosome_TCGA_CellLine_CorrelationHeatmap_AllTumors.pdf` Heatmap of the spearman correlations of different in vitro cell models to all primary tumors available in the TCGA dataset irrespective of subtype for the spliceosomal gene set.
+   - `Spliceosome_TCGA_CellLine_CorrelationHeatmap_ERpos.pdf` Same as above, only including ER positive tumors.
+   - `Spliceosome_TCGA_CellLine_CorrelationHeatmap_TNBC.pdf` Same as above, only including TNBC primary tumors.
+   - `Spliceosome_TCGA_CellLine_Correlation_Boxplot_AllTumors.pdf` Boxplot displaying the spearman correlation distribution of different in vitro models taking into consideration all primary tumors irrespective of subtype for the spliceosomal gene set.
+   - `Spliceosome_TCGA_CellLine_Correlation_Boxplot_ERpos.pdf` Same as above, but now only including ER positive tumors.
+   - `Spliceosome_TCGA_CellLine_Correlation_Boxplot_TNBC.pdf` Same as above, but now only including TNBC tumors.
+   - `Spliceosome_TCGA_CellLine_Correlation_Boxplot_Delta2Dvs3D_AllTumors.pdf` Boxplot displaying the difference in spearman correlation comparing 2D and 3D models of the same cell line to primary breast tumors irrespective of their subtype based on the spliceosomal gene set.
+   - `Spliceosome_TCGA_CellLine_Correlation_Boxplot_Delta2Dvs3D_ERpos.pdf` Same as above, but now only including ER positive tumors.
+   - `Spliceosome_TCGA_CellLine_Correlation_Boxplot_Delta2Dvs3D_TNBC.pdf` Same as above, but now only including TNBC tumors.
