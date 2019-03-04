@@ -7,6 +7,10 @@ Data and code for Koedoot et al., Differential reprogramming of breast
 cancer subtypes in 3D cultures and implications for sensitivity to
 targeted therapy. (2019)
 
+For an overview of the procedure see the
+[`ProcedureOverview.pdf`](ProcedureOverview.pdf) file, for usage of the
+R scripts see below.
+
 # Installation
 
 Clone this repository or download the current version as [a zip

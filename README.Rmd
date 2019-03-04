@@ -23,6 +23,8 @@ mycat <- function(text){
 
 Data and code for Koedoot et al., Differential reprogramming of breast cancer subtypes in 3D cultures and implications for sensitivity to targeted therapy. (2019)
 
+For an overview of the procedure see the [`ProcedureOverview.pdf`](ProcedureOverview.pdf) file, for usage of the R scripts see below.
+
 # Installation
 
 Clone this repository or download the current version as [a zip file](https://gitlab.com/lacdr-dds/vandewater/koedoot_2d3d_rnaseq/-/archive/master/koedoot_2d3d_rnaseq-master.zip). 
