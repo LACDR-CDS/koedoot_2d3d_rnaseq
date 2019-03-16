@@ -3,6 +3,7 @@ library("reshape2")
 library("tidyr")
 library("pheatmap")
 library("readr")
+library("dplyr")
 
 # To avoid data.frame vs tibble issues (eg with deprecated rownames)
 read_tsv <- function(...) {
@@ -215,7 +216,7 @@ outputdir <- paste(parent.dir, "TCGAsubtypes/", sep="/")
 
 TCGA_Subtype_DF <- read_tsv(file.path(shared.files.dir, "TCGA_PrimaryTumor_Subtype_Expression.txt.xz")) # Load TCGA data
 TCGA_Subtype_DF[1:5, 1:5]
-GeneDF <- subset(TCGA_Subtype_DF, select = c("TumorType", paste("ID", GeneIDs, sep = "_")))
+GeneDF <- select(TCGA_Subtype_DF, one_of(c("TumorType", paste("ID", GeneIDs, sep = "_"))))
 GeneDF$PatientID <- seq(from = 1, to = nrow(GeneDF), by = 1)
 
 AnnotationDF <- subset(GeneDF, select = c("TumorType"))
@@ -443,7 +444,7 @@ RNAseq_TCGA3 <- as.data.frame(t(RNAseq_TCGA2))
 RNAseq_TCGA3$entrez <- gsub("X", "", rownames(RNAseq_TCGA3))
 
 GenesToRemove_2Dvs3D <- read.table("GenesToRemove_2Dvs3D.txt", sep = "\t", header= FALSE) [,1] # Select genes from the data frames and merge them
-GenesToRemove_TCGA <- read.table("GenesToRemove_TCGAsubtype.txt", sep = "\t", header = FALSE) [,1]
+GenesToRemove_TCGA <- read.table("GenesToRemove_TCGA_Subtype.txt", sep = "\t", header = FALSE) [,1]
 GenesToRemove <- intersect(GenesToRemove_2Dvs3D, GenesToRemove_TCGA)
 GenesIDs_Sel <- GenesDF[!GenesDF$GeneSymbol %in% GenesToRemove, ]$EntrezID
 
