@@ -27,6 +27,7 @@ following files (files that end in `.xz` are compressed to save
   - <code>BRCA\_\_illuminahiseq\_rnaseqv2\_\_GeneExp\_SolidTissueNormal.txt.xz</code>
   - <code>LogNormalizedCounts\_2DCellLines.txt.xz</code>
   - <code>MetaData\_2Dvs3D.txt</code>
+  - <code>NormalizedCounts\_2Dvs3D.txt.xz</code>
   - <code>Subtype\_CellLines.txt</code>
   - <code>TCGA\_PrimaryTumor\_Subtype\_Expression.txt.xz</code>
 
@@ -35,7 +36,6 @@ following files (files that end in `.xz` are compressed to save
 Create a working directory that contains the following files (can be
 found in [`FilesForSingleGeneAnalysis`](FilesForSingleGeneAnalysis)):
 
-  - <code>NormalizedCounts\_2Dvs3D.txt</code>
   - <code>SingleGene\_Analysis.R</code>
 
 You can set the working directory and the `FilesShared` directory using
@@ -63,7 +63,7 @@ This script can be used to:
 
 **Important note:** you can run these parts of the script separately,
 but before you start you **ALWAYS** have to run
-[SingleGene\_Analysis.R\#L1-17](FilesForSingleGeneAnalysis/SingleGene_Analysis.R#1-17).
+[SingleGene\_Analysis.R\#L1-17](FilesForSingleGeneAnalysis/SingleGene_Analysis.R#L1-17).
 Make sure you set the correct working directory.
 
 ### Input
@@ -163,13 +163,12 @@ Create a working directory that contains the following files
 ([`FilesForMultipleGeneAnalysis`](FilesForMultipleGeneAnalysis)):
 
   - <code>MultipleGenes\_Analysis.R</code>
-  - <code>NormalizedCounts\_2Dvs3D.txt</code>
   - <code>TCGApatient\_ReceptorStatus.txt</code>
   - <code>TCGARNAseq\_LogNormalized.txt.xz</code>
 
 You can set the working directory and the `FilesShared` directory using
 the `parent.dir` and `shared.files.dir` variable at
-[MultipleGenes\_Analysis.R\#L12-14](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L12-14).
+[MultipleGenes\_Analysis.R\#L12-15](FilesForMultipleGeneAnalysis/MultipleGenes_Analysis.R#L12-15).
 
 This script can be used to:
 
