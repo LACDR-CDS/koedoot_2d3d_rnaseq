@@ -1,0 +1,2 @@
+GeneSymbol	EntrezID	Ensembl
+MCM2	4171	ENSG00000073111
