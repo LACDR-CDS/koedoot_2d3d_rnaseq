@@ -27,7 +27,7 @@ For an overview of the procedure see the [`ProcedureOverview.pdf`](ProcedureOver
 
 # Installation
 
-Clone this repository or download the current version as [a zip file](https://gitlab.com/lacdr-dds/vandewater/koedoot_2d3d_rnaseq/-/archive/master/koedoot_2d3d_rnaseq-master.zip). 
+Clone this repository or download the current version as [a zip file](https://gitlab.services.universiteitleiden.nl/lacdr-dds/vandewater/koedoot_2d3d_rnaseq/-/archive/master/koedoot_2d3d_rnaseq-master.zip). 
 
 # Usage
 
