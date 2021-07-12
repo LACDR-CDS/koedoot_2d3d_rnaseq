@@ -1,4 +1,3 @@
-
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # Koedoot et al. 2019. Data and Code
@@ -14,7 +13,7 @@ R scripts see below.
 # Installation
 
 Clone this repository or download the current version as [a zip
-file](https://gitlab.com/lacdr-dds/vandewater/koedoot_2d3d_rnaseq/-/archive/master/koedoot_2d3d_rnaseq-master.zip).
+file](https://gitlab.services.universiteitleiden.nl/lacdr-dds/vandewater/koedoot_2d3d_rnaseq/-/archive/master/koedoot_2d3d_rnaseq-master.zip).
 
 # Usage
 
